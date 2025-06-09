@@ -1,8 +1,7 @@
-
-import CitySimUI from "./CitySimUI";
+import CitySimGridUI from "./CitySimGridUI";
 
 function App() {
-  return <CitySimUI />;
+  return <CitySimGridUI />;
 }
 
 export default App;
