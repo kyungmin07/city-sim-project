@@ -1,8 +1,10 @@
-
 import React, { useState } from "react";
-import axios from "axios";
+import "./CitySimUI.css"; // 스타일 분리 추천
 
 export default function CitySimUI() {
+  const initialGrid = Array(5 * 5).fill("empty"); // 5x5 격자
+
+  const [grid, setGrid] = useState(initialGrid);
   const [state, setState] = useState({
     pollution: 80,
     happiness: 50,
@@ -10,26 +12,62 @@ export default function CitySimUI() {
     feedback: "시민 피드백을 확인하세요."
   });
 
-  const handleClick = async () => {
-    const res = await axios.post("http://localhost:8000/simulate", {
-      policy: "pollution_policy",
-      state: {
-        pollution: state.pollution,
-        happiness: state.happiness,
-        parks: state.parks
-      }
-    });
-    setState(res.data);
+  const buildAt = (index, type) => {
+    const newGrid = [...grid];
+    newGrid[index] = type;
+    setGrid(newGrid);
+
+    // 상태 변화 예시
+    if (type === "park") {
+      setState(prev => ({
+        ...prev,
+        pollution: prev.pollution - 10,
+        happiness: prev.happiness + 5,
+        parks: prev.parks + 1,
+        feedback: "🌳 공원이 지어졌습니다!"
+      }));
+    }
+    if (type === "factory") {
+      setState(prev => ({
+        ...prev,
+        pollution: prev.pollution + 20,
+        happiness: prev.happiness - 5,
+        feedback: "🏭 공장이 지어졌습니다! 오염도가 증가했습니다."
+      }));
+    }
   };
 
   return (
     <div>
       <h1>🏙️ 지역사회 시뮬레이터</h1>
-      <div>오염도: {state.pollution}</div>
-      <div>행복도: {state.happiness}</div>
-      <div>공원 수: {state.parks}</div>
-      <button onClick={handleClick}>공원 건설 정책 실행</button>
-      <p>📢 {state.feedback}</p>
+
+      <div className="grid-container">
+        {grid.map((cell, index) => (
+          <div
+            key={index}
+            className={`grid-cell ${cell}`}
+            onClick={() => buildAt(index, "house")}
+          >
+            {cell === "empty" && "⬜️"}
+            {cell === "house" && "🏠"}
+            {cell === "factory" && "🏭"}
+            {cell === "park" && "🌳"}
+          </div>
+        ))}
+      </div>
+
+      <div>
+        <button onClick={() => setGrid(grid.map(() => "house"))}>🏠 주택 건설</button>
+        <button onClick={() => setGrid(grid.map(() => "factory"))}>🏭 공장 건설</button>
+        <button onClick={() => setGrid(grid.map(() => "park"))}>🌳 공원 건설</button>
+      </div>
+
+      <div>
+        <p>오염도: {state.pollution}</p>
+        <p>행복도: {state.happiness}</p>
+        <p>공원 수: {state.parks}</p>
+        <p>📢 {state.feedback}</p>
+      </div>
     </div>
   );
 }
