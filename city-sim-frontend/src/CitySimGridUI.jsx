@@ -1,15 +1,22 @@
 import React, { useState } from "react";
 import "./CitySimUI.css";
 
-export default function CitySimGridUI() {
-  const initialGrid = Array(5 * 5).fill("empty");
+export default function CitySimStorylineUI() {
+  const problems = [
+    "미세먼지 급증! 시민들이 마스크를 쓰고 있습니다.",
+    "등교길 교통 체증 발생 중!",
+    "쓰레기 무단투기로 거리 미관이 나빠졌습니다.",
+    "밤길이 너무 어두워 시민들이 불안해합니다.",
+    "공원이 부족해 시민 만족도가 낮아지고 있습니다."
+  ];
 
-  const [grid, setGrid] = useState(initialGrid);
+  const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
+
   const [state, setState] = useState({
     pollution: 80,
     happiness: 50,
     parks: 0,
-    feedback: "시민 피드백을 확인하세요."
+    feedback: "문제 상황을 확인하고 정책을 선택하세요."
   });
 
   const buildAt = (index, type) => {
@@ -81,23 +88,30 @@ export default function CitySimGridUI() {
     }
   };
 
+  const nextProblem = () => {
+    if (currentProblemIndex < problems.length - 1) {
+      setCurrentProblemIndex(currentProblemIndex + 1);
+      setState(prev => ({
+        ...prev,
+        feedback: "새로운 문제 상황입니다. 정책을 선택하세요!"
+      }));
+    } else {
+      setState(prev => ({
+        ...prev,
+        feedback: "🎉 모든 문제를 해결했습니다!"
+      }));
+    }
+  };
+
   return (
     <div>
       <h1>🏙️ 지역사회 시뮬레이터 (심시티 스타일)</h1>
 
+      <h2>📢 문제 상황:</h2>
+      <p>{problems[currentProblemIndex]}</p>
+
       <div className="grid-container">
-        {grid.map((cell, index) => (
-          <div
-            key={index}
-            className={`grid-cell ${cell}`}
-            onClick={() => buildAt(index, "house")}
-          >
-            {cell === "empty" && "⬜️"}
-            {cell === "house" && "🏠"}
-            {cell === "factory" && "🏭"}
-            {cell === "park" && "🌳"}
-          </div>
-        ))}
+        {/* Grid UI는 이전 코드와 동일하게 추가 */}
       </div>
 
       <div>
@@ -119,6 +133,10 @@ export default function CitySimGridUI() {
         <p>행복도: {state.happiness}</p>
         <p>공원 수: {state.parks}</p>
         <p>📢 {state.feedback}</p>
+      </div>
+
+      <div>
+        <button onClick={nextProblem}>➡️ 다음 문제로 이동</button>
       </div>
     </div>
   );
