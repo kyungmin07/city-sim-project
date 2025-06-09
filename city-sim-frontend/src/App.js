@@ -1,7 +1,7 @@
-import CitySimGridUI from "./CitySimGridUI";
+import CitySimStorylineUI from "./CitySimStorylineUI";
 
 function App() {
-  return <CitySimGridUI />;
+  return <CitySimStorylineUI />;
 }
 
 export default App;
